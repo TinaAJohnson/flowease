@@ -39,6 +39,24 @@ export interface Invoice {
   notes?: string;
 }
 
+export enum CalendarProvider {
+  GOOGLE = 'google',
+  MICROSOFT = 'microsoft',
+  ICLOUD = 'icloud'
+}
+
+export interface CalendarIntegration {
+  provider: CalendarProvider;
+  isConnected: boolean;
+  email?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  expiresAt?: number;
+  lastSyncedAt?: string;
+  syncEnabled: boolean;
+  selectedCalendarId?: string;
+}
+
 export interface PracticeSettings {
   notificationSound: SoundType;
   autoInvoice: boolean;
@@ -48,6 +66,7 @@ export interface PracticeSettings {
   workDayEnd: string;
   sessionLength: number;
   googleCalendarEmail: string;
+  calendarIntegrations: Record<CalendarProvider, CalendarIntegration>;
 }
 
 export type ViewState = 'landing' | 'dashboard' | 'scheduling' | 'billing' | 'settings';

@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { SoundType, Appointment, AppointmentStatus, PracticeSettings } from '../types';
+import { SoundType, Appointment, AppointmentStatus, PracticeSettings, CalendarProvider } from '../types';
+import CalendarIntegrations from './CalendarIntegrations';
 
 interface SettingsProps {
   settings: PracticeSettings;
@@ -147,6 +148,13 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings, appointments
           </div>
         </section>
       </div>
+
+      <section className="bg-white p-16 rounded-[4rem] border border-slate-100 shadow-2xl space-y-12">
+        <CalendarIntegrations 
+          settings={settings}
+          setSettings={setSettings}
+        />
+      </section>
 
       <section className="bg-slate-900 p-20 rounded-[5rem] text-white shadow-3xl text-center space-y-12 overflow-hidden relative">
              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full"></div>

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ViewState, Appointment, Invoice, AppointmentStatus, SoundType, PracticeSettings } from './types';
+import { ViewState, Appointment, Invoice, AppointmentStatus, SoundType, PracticeSettings, CalendarProvider } from './types';
 import Dashboard from './components/Dashboard';
 import Scheduling from './components/Scheduling';
 import Billing from './components/Billing';
@@ -24,7 +24,42 @@ const App: React.FC = () => {
     workDayStart: "08:00",
     workDayEnd: "18:00",
     sessionLength: 50,
-    googleCalendarEmail: ""
+    googleCalendarEmail: "",
+    calendarIntegrations: {
+      [CalendarProvider.GOOGLE]: {
+        provider: CalendarProvider.GOOGLE,
+        isConnected: false,
+        syncEnabled: false,
+        email: undefined,
+        accessToken: undefined,
+        refreshToken: undefined,
+        expiresAt: undefined,
+        lastSyncedAt: undefined,
+        selectedCalendarId: undefined
+      },
+      [CalendarProvider.MICROSOFT]: {
+        provider: CalendarProvider.MICROSOFT,
+        isConnected: false,
+        syncEnabled: false,
+        email: undefined,
+        accessToken: undefined,
+        refreshToken: undefined,
+        expiresAt: undefined,
+        lastSyncedAt: undefined,
+        selectedCalendarId: undefined
+      },
+      [CalendarProvider.ICLOUD]: {
+        provider: CalendarProvider.ICLOUD,
+        isConnected: false,
+        syncEnabled: false,
+        email: undefined,
+        accessToken: undefined,
+        refreshToken: undefined,
+        expiresAt: undefined,
+        lastSyncedAt: undefined,
+        selectedCalendarId: undefined
+      }
+    }
   });
 
   useEffect(() => {
