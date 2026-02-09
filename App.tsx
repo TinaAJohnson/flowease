@@ -5,6 +5,8 @@ import Dashboard from './components/Dashboard';
 import Scheduling from './components/Scheduling';
 import Billing from './components/Billing';
 import Settings from './components/Settings';
+import OAuthCallback from './components/OAuthCallback';
+import { loadAllTokens, clearAllTokens } from './utils/storage';
 
 const STORAGE_KEY = 'flowease_sovereign_vault_v5';
 
@@ -69,7 +71,21 @@ const App: React.FC = () => {
         const parsed = JSON.parse(savedData);
         setAppointments(parsed.appointments || []);
         setInvoices(parsed.invoices || []);
-        setSettings(parsed.settings || settings);
+        const loadedSettings = parsed.settings || settings;
+        
+        // Restore calendar integrations from localStorage
+        const storedTokens = loadAllTokens();
+        loadedSettings.calendarIntegrations = {
+          ...loadedSettings.calendarIntegrations,
+          ...Object.entries(storedTokens).reduce((acc, [provider, token]) => {
+            if (token) {
+              acc[provider as CalendarProvider] = token;
+            }
+            return acc;
+          }, {} as Record<CalendarProvider, any>)
+        };
+        
+        setSettings(loadedSettings);
       } catch (e) {
         console.error("Vault read failure", e);
       }
@@ -83,7 +99,7 @@ const App: React.FC = () => {
       const validViews: ViewState[] = ['landing', 'dashboard', 'scheduling', 'billing', 'settings'];
       if (validViews.includes(hash)) {
         setCurrentView(hash);
-      } else if (window.location.hash === '') {
+      } else if (window.location.hash === '' || hash === 'auth') {
         setCurrentView('landing');
       }
     };
@@ -141,6 +157,7 @@ const App: React.FC = () => {
   const purgeVault = () => {
     if (window.confirm("PURGE WARNING: This permanently wipes every patient identity and financial record from this machine. Do you wish to leave no footprint behind?")) {
       localStorage.removeItem(STORAGE_KEY);
+      clearAllTokens(); // Clear all calendar tokens
       window.location.reload();
     }
   };

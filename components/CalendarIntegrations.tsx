@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { CalendarProvider, CalendarIntegration, PracticeSettings } from '../types';
+import { initiateOAuthFlow } from '../utils/oauth';
+import { clearTokens } from '../utils/storage';
 
 interface CalendarIntegrationsProps {
   settings: PracticeSettings;
   setSettings: (s: PracticeSettings) => void;
-  onConnectGoogle?: () => void;
-  onConnectMicrosoft?: () => void;
-  onConnectICloud?: () => void;
-  onDisconnect?: (provider: CalendarProvider) => void;
-  onToggleSync?: (provider: CalendarProvider, enabled: boolean) => void;
 }
 
 const PROVIDER_CONFIG = {
@@ -37,12 +34,7 @@ const PROVIDER_CONFIG = {
 
 const CalendarIntegrations: React.FC<CalendarIntegrationsProps> = ({
   settings,
-  setSettings,
-  onConnectGoogle,
-  onConnectMicrosoft,
-  onConnectICloud,
-  onDisconnect,
-  onToggleSync
+  setSettings
 }) => {
   const [expandedProvider, setExpandedProvider] = useState<CalendarProvider | null>(null);
   const [isConnecting, setIsConnecting] = useState<CalendarProvider | null>(null);
@@ -51,21 +43,15 @@ const CalendarIntegrations: React.FC<CalendarIntegrationsProps> = ({
     setIsConnecting(provider);
     
     try {
-      switch (provider) {
-        case CalendarProvider.GOOGLE:
-          onConnectGoogle?.();
-          break;
-        case CalendarProvider.MICROSOFT:
-          onConnectMicrosoft?.();
-          break;
-        case CalendarProvider.ICLOUD:
-          onConnectICloud?.();
-          break;
-      }
+      // Store provider in session storage so callback knows which one to update
+      sessionStorage.setItem('oauth_provider', provider);
+      
+      // Initiate OAuth flow
+      initiateOAuthFlow(provider);
     } catch (error) {
       console.error(`Failed to connect ${provider}:`, error);
-    } finally {
       setIsConnecting(null);
+      alert('Failed to initiate authentication. Check console for details.');
     }
   };
 
@@ -86,7 +72,7 @@ const CalendarIntegrations: React.FC<CalendarIntegrationsProps> = ({
         }
       };
       setSettings(updated);
-      onDisconnect?.(provider);
+      clearTokens(provider);
     }
   };
 
@@ -105,7 +91,12 @@ const CalendarIntegrations: React.FC<CalendarIntegrationsProps> = ({
       }
     };
     setSettings(updated);
-    onToggleSync?.(provider, newSyncEnabled);
+    
+    // Save updated tokens to storage
+    if (integration.isConnected) {
+      const { storage } = require('../utils/storage');
+      storage.saveTokens(provider, updated.calendarIntegrations[provider]);
+    }
   };
 
   const renderIntegrationCard = (provider: CalendarProvider) => {
