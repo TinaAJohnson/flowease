@@ -1,0 +1,9 @@
+
+{
+  "name": "FlowEase - Restorative Practice Sanctuary",
+  "description": "An automated scheduling and invoicing assistant designed to promote relaxed effort for practitioners by managing patient flows and billing seamlessly.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
