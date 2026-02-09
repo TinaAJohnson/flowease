@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CalendarProvider, CalendarIntegration, PracticeSettings } from '../types';
 import { initiateOAuthFlow } from '../utils/oauth';
-import { clearTokens } from '../utils/storage';
+import { clearTokens, saveTokens } from '../utils/storage';
 
 interface CalendarIntegrationsProps {
   settings: PracticeSettings;
@@ -94,8 +94,7 @@ const CalendarIntegrations: React.FC<CalendarIntegrationsProps> = ({
     
     // Save updated tokens to storage
     if (integration.isConnected) {
-      const { storage } = require('../utils/storage');
-      storage.saveTokens(provider, updated.calendarIntegrations[provider]);
+      saveTokens(provider, updated.calendarIntegrations[provider]);
     }
   };
 
